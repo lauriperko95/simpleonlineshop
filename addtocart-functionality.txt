@@ -1,0 +1,1 @@
+This file creates crazy js code for adding items to shopping cart.
