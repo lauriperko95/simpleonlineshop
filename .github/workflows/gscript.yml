@@ -6,6 +6,10 @@ on:
   pull_request:
     types: [opened]
 
+permissions:
+  issues: write
+  pull-requests: write
+
 jobs:
   label_issues:
     if: github.event_name == 'issues' && (github.event.action == 'opened' || github.event.action == 'reopened')
@@ -48,29 +52,10 @@ jobs:
     if: github.event_name == 'pull_request' && github.event.action == 'opened'
     runs-on: ubuntu-latest
     permissions:
-      pull-requests: read
       issues: write
     steps:
-      - name: Check whether this is the author's first pull request
-        id: first_pr_check
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const author = context.payload.pull_request.user.login;
-
-            const { data: pulls } = await github.rest.pulls.list({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: 'all',
-              per_page: 100
-            });
-
-            const authorPRs = pulls.filter(pr => pr.user.login === author);
-
-            core.setOutput('is_first_pr', authorPRs.length === 1 ? 'true' : 'false');
-
       - name: Congratulate first pull request
-        if: steps.first_pr_check.outputs.is_first_pr == 'true'
+        if: github.event.pull_request.author_association == 'FIRST_TIMER' || github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR'
         uses: peter-evans/create-or-update-comment@v1
         with:
           issue-number: ${{ github.event.pull_request.number }}
