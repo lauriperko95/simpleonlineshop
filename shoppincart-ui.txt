@@ -1,1 +1,1 @@
-This file contains the fixed UI for shopping cart.
+This file contains the fixed UI for shopping cart. Upgraded layout.
